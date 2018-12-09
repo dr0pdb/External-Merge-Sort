@@ -6,5 +6,6 @@
 	#include <fstream>
 	
 	void generate_random_text_file(std::string file_name, int file_size);
+	FILE* openFile(std::string file_name, char* mode);
 
 #endif
