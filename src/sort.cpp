@@ -52,3 +52,24 @@ void create_initial_runs(std::string input_file, int page_size, int number_block
 
 	fclose(in);
 }
+
+void merge_files(std::string output_file, int page_size, int number_blocks) {
+	FILE *input_scratch_files[number_blocks]; // These are output scratch files created in the first step.
+	char read_mode = 'r', write_mode = 'w';
+	for (int i = 0; i < number_blocks; ++i)
+	{
+		input_scratch_files[i] = openFile(std::to_string(i), &read_mode);
+	}
+
+	FILE *final_output = openFile(output_file, &write_mode);
+
+	// sort using heaps.
+
+	// close the file streams.
+	for (int i = 0; i < number_blocks; ++i)
+	{
+		fclose(input_scratch_files[i]);
+	}
+
+	fclose(final_output);
+}
