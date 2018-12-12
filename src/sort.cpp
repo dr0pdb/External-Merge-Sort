@@ -2,6 +2,7 @@
 #include <utils.h>
 #include <vector>
 #include <algorithm>
+#include <queue>
 
 /*
 	Creates initial runs for the external merge sort algorithm.
@@ -53,6 +54,9 @@ void create_initial_runs(std::string input_file, int page_size, int number_block
 	fclose(in);
 }
 
+/*
+	Merges the created input scratch files to sort the entries.
+*/
 void merge_files(std::string output_file, int page_size, int number_blocks) {
 	FILE *input_scratch_files[number_blocks]; // These are output scratch files created in the first step.
 	char read_mode = 'r', write_mode = 'w';
@@ -63,7 +67,31 @@ void merge_files(std::string output_file, int page_size, int number_blocks) {
 
 	FILE *final_output = openFile(output_file, &write_mode);
 
-	// sort using heaps.
+	// sort using heap-sort.
+	std::priority_queue<std::pair<int,int>, std::vector<std::pair<int,int> >, std::greater<std::pair<int,int> > > heap;
+	int i, value; 
+    for (i = 0; i < number_blocks; i++) 
+    { 
+        if (fscanf(input_scratch_files[i], "%d ", &value) != 1) 
+            break; 
+  
+  		heap.push({value, i}); // push the value and index of the scratch file in the min heap. 
+    } 
+
+    int done = 0; // holds the number of scratch file which are done.
+    while(done != i) {
+    	std::pair<int,int> current = heap.top();
+    	heap.pop();
+
+    	fprintf(final_output, "%d ", current.first);
+
+  		if (fscanf(input_scratch_files[current.second], "%d ", &value) != 1) {
+  			done++; // we are done with this input file.
+  		} else {
+  			//insert next value from the input file to the heap.
+  			heap.push({value, current.second});
+  		}
+    }
 
 	// close the file streams.
 	for (int i = 0; i < number_blocks; ++i)
